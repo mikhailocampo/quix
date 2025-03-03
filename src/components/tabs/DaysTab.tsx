@@ -30,7 +30,7 @@ export function DaysTab({ config, updateConfig, startDate, onStartDateChange }: 
 
   const addEvent = (dayIndex: number) => {
     const newDays = [...config.days];
-    newDays[dayIndex].events.push({ title: '', time: '' });
+    newDays[dayIndex].events.push({ title: '', time: '', isOptional: false });
     updateConfig({ days: newDays });
   };
 
@@ -82,68 +82,99 @@ export function DaysTab({ config, updateConfig, startDate, onStartDateChange }: 
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center space-x-3 p-3 rounded-none">
-              <Checkbox 
-                id={`optional-${dayIndex}`} 
-                checked={day.isOptional}
-                onCheckedChange={(checked) => 
-                  updateDay(dayIndex, { isOptional: !!checked })
-                }
-              />
-              <Label htmlFor={`optional-${dayIndex}`} className="font-medium">Optional Day</Label>
+            <div className="flex flex-wrap gap-4 p-3 rounded-none pb-4">
+              <div className="flex items-center space-x-3 ml-auto">
+                <div className="flex items-center gap-2">
+                  <input 
+                    type="color" 
+                    id={`day-color-${dayIndex}`}
+                    value={day.color || config.headerColor}
+                    onChange={(e) => updateDay(dayIndex, { color: e.target.value })}
+                    className="w-8 h-8 p-1 rounded cursor-pointer"
+                  />
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => updateDay(dayIndex, { color: undefined })}
+                    className="text-xs"
+                    title="Reset to default color"
+                  >
+                    Reset
+                  </Button>
+                </div>
+              </div>
             </div>
 
             <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <h3 className="font-semibold text-lg">Events</h3>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => addEvent(dayIndex)}
-                  className="flex items-center"
-                >
-                  <span className="mr-1">+</span> Add Event
-                </Button>
-              </div>
-
-              {day.events.length === 0 && (
-                <p className="text-sm text-gray-500 dark:text-gray-400 italic p-3 text-center bg-gray-50 dark:bg-gray-800 rounded-md">
-                  No events added. Click "Add Event" to create one.
-                </p>
-              )}
-
               {day.events.map((event, eventIndex) => (
-                <div key={eventIndex} className="space-y-4 p-4 bg-white dark:bg-gray-800 ounded-none">
-                  <div className="flex justify-between items-center border-b dark:border-gray-700 pb-3">
-                    <h4 className="font-medium">Event {eventIndex + 1}</h4>
+                <div key={eventIndex} className="p-4 rounded-lg">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label 
+                        htmlFor={`event-title-${dayIndex}-${eventIndex}`}
+                        className="font-medium"
+                      >
+                        Event Title
+                      </Label>
+                      <Input 
+                        id={`event-title-${dayIndex}-${eventIndex}`}
+                        placeholder="Event title"
+                        value={event.title}
+                        onChange={(e) => 
+                          updateEvent(dayIndex, eventIndex, { title: e.target.value })
+                        }
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label 
+                        htmlFor={`event-time-${dayIndex}-${eventIndex}`}
+                        className="font-medium"
+                      >
+                        Event Time
+                      </Label>
+                      <Input 
+                        id={`event-time-${dayIndex}-${eventIndex}`}
+                        placeholder="8:00PM"
+                        value={event.time}
+                        onChange={(e) => 
+                          updateEvent(dayIndex, eventIndex, { time: e.target.value })
+                        }
+                        className="mt-1"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="mt-3 flex justify-between items-center">
+                    <div className="flex items-center space-x-3">
+                      <Checkbox 
+                        id={`optional-event-${dayIndex}-${eventIndex}`} 
+                        checked={event.isOptional}
+                        onCheckedChange={(checked) => 
+                          updateEvent(dayIndex, eventIndex, { isOptional: !!checked })
+                        }
+                      />
+                      <Label htmlFor={`optional-event-${dayIndex}-${eventIndex}`} className="font-medium">
+                        Optional Event
+                      </Label>
+                    </div>
                     <Button 
-                      variant="ghost" 
+                      variant="destructive" 
                       size="sm"
                       onClick={() => removeEvent(dayIndex, eventIndex)}
-                      className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-none"
                     >
                       Remove
                     </Button>
                   </div>
-                  <div className="space-y-3">
-                    <Label htmlFor={`event-title-${dayIndex}-${eventIndex}`}>Title</Label>
-                    <Input 
-                      id={`event-title-${dayIndex}-${eventIndex}`}
-                      value={event.title} 
-                      onChange={(e) => updateEvent(dayIndex, eventIndex, { title: e.target.value })} 
-                    />
-                  </div>
-                  <div className="space-y-3">
-                    <Label htmlFor={`event-time-${dayIndex}-${eventIndex}`}>Time</Label>
-                    <Input 
-                      id={`event-time-${dayIndex}-${eventIndex}`}
-                      value={event.time} 
-                      onChange={(e) => updateEvent(dayIndex, eventIndex, { time: e.target.value })} 
-                      placeholder="e.g. 8:00PM or ALL DAY"
-                    />
-                  </div>
                 </div>
               ))}
+              <Button 
+                onClick={() => addEvent(dayIndex)}
+                className="w-full"
+                variant="outline"
+              >
+                Add Event
+              </Button>
             </div>
           </CardContent>
         </Card>

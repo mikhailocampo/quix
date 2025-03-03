@@ -1,13 +1,14 @@
 export interface DayEvent {
   title: string;
   time: string;
+  isOptional?: boolean;
 }
 
 export interface DayBlock {
   day: string;
   date: string;
   events: DayEvent[];
-  isOptional: boolean;
+  color?: string;
   specialGuest: {
     enabled: boolean;
     text: string;
@@ -22,7 +23,7 @@ export interface FlierConfig {
   days: DayBlock[];
   rightPanel: {
     backgroundImage: string;
-    hashtags: string[];
+    hashtags: { text: string; color: string }[];
     inspirationalQuotes: string[];
   };
   progress: {
@@ -35,11 +36,13 @@ export interface FlierConfig {
     width: string;
     height: string;
   };
+  headerColor: string;
 }
 
 export const defaultFlierConfig: FlierConfig = {
   title: "WEEKLY SCHEDULE!",
   subtitle: "UNITED VISIONARY",
+  headerColor: "#1e293b",
   days: [
     {
       day: "MONDAY",
@@ -47,15 +50,15 @@ export const defaultFlierConfig: FlierConfig = {
       events: [
         {
           title: "POWER HOUR",
-          time: "8:00PM"
+          time: "8:00PM",
+          isOptional: true
         }
       ],
-      isOptional: true,
       specialGuest: {
         enabled: false,
-        text: "SPECIAL GUESTS",
-        shape: "circle",
-        color: "#8cb3ff"
+        text: '',
+        shape: 'circle',
+        color: '#3b82f6'
       }
     },
     {
@@ -63,20 +66,21 @@ export const defaultFlierConfig: FlierConfig = {
       date: "2/25",
       events: [
         {
-          title: "JESSICA TEAM VISIT NORCAL",
-          time: ""
+          title: "BRAINSTORM SESH",
+          time: "7:00PM",
+          isOptional: false
         },
         {
-          title: "MAIKA BOARD PLAN",
-          time: "6:30PM"
+          title: "GAME NIGHT",
+          time: "9:00PM",
+          isOptional: false
         }
       ],
-      isOptional: false,
       specialGuest: {
         enabled: true,
-        text: "SPECIAL GUESTS",
-        shape: "circle",
-        color: "#8cb3ff"
+        text: "FEATURING @JOHN DOE",
+        shape: "square",
+        color: "#f97316"
       }
     },
     {
@@ -84,16 +88,16 @@ export const defaultFlierConfig: FlierConfig = {
       date: "2/26",
       events: [
         {
-          title: "MISA DO VISIT NORCAL",
-          time: "8:00PM"
+          title: "WISDOM WEDNESDAY",
+          time: "8:00PM",
+          isOptional: false
         }
       ],
-      isOptional: false,
       specialGuest: {
         enabled: true,
-        text: "SPECIAL GUESTS",
-        shape: "circle",
-        color: "#8cb3ff"
+        text: "WITH @JANE SMITH",
+        shape: "triangle",
+        color: "#a855f7"
       }
     },
     {
@@ -101,20 +105,16 @@ export const defaultFlierConfig: FlierConfig = {
       date: "2/27",
       events: [
         {
-          title: "FUNCTION PREPARATION",
-          time: "6PM-10PM"
-        },
-        {
-          title: "Please Come Help When you can!",
-          time: ""
+          title: "DEEP DIVE",
+          time: "7:30PM",
+          isOptional: false
         }
       ],
-      isOptional: false,
       specialGuest: {
         enabled: false,
         text: "",
         shape: "circle",
-        color: "#8cb3ff"
+        color: "#ec4899"
       }
     },
     {
@@ -122,16 +122,16 @@ export const defaultFlierConfig: FlierConfig = {
       date: "2/28",
       events: [
         {
-          title: "FUNCTION",
-          time: "ALL DAY"
+          title: "CELEBRATE WINS",
+          time: "8:30PM",
+          isOptional: false
         }
       ],
-      isOptional: false,
       specialGuest: {
         enabled: false,
         text: "",
         shape: "circle",
-        color: "#8cb3ff"
+        color: "#14b8a6"
       }
     },
     {
@@ -139,46 +139,46 @@ export const defaultFlierConfig: FlierConfig = {
       date: "2/29",
       events: [
         {
-          title: "FUNCTION",
-          time: "ALL DAY"
+          title: "WEEKEND VIBES",
+          time: "ALL DAY",
+          isOptional: false
         }
       ],
-      isOptional: false,
       specialGuest: {
         enabled: false,
         text: "",
         shape: "circle",
-        color: "#8cb3ff"
+        color: "#f59e0b"
       }
     },
     {
       day: "SUNDAY",
-      date: "2/30",
+      date: "3/1",
       events: [
         {
-          title: "FUNCTION",
-          time: "ALL DAY"
+          title: "REST & RESET",
+          time: "ALL DAY",
+          isOptional: false
         }
       ],
-      isOptional: false,
       specialGuest: {
         enabled: false,
         text: "",
         shape: "circle",
-        color: "#8cb3ff"
+        color: "#3b82f6"
       }
     }
   ],
   rightPanel: {
     backgroundImage: "https://images.unsplash.com/photo-1516542076529-1ea3854896f2?q=80&w=2342&auto=format&fit=crop",
     hashtags: [
-      "#MARCH 3",
-      "LAUNCH",
-      "#BELIEVE",
-      "#RETAIL!",
-      "#LOVE",
-      "YOU",
-      "7500"
+      { text: "#MARCH 3", color: "#FFFFFF" },
+      { text: "LAUNCH", color: "#FFC107" },
+      { text: "#BELIEVE", color: "#FFFFFF" },
+      { text: "#RETAIL!", color: "#FFC107" },
+      { text: "#LOVE", color: "#FFFFFF" },
+      { text: "YOU", color: "#FFC107" },
+      { text: "7500", color: "#FFFFFF" }
     ],
     inspirationalQuotes: []
   },

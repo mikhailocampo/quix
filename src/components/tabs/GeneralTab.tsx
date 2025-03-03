@@ -33,6 +33,29 @@ export function GeneralTab({ config, updateConfig }: GeneralTabProps) {
           />
         </div>
         
+        <div className="space-y-3">
+          <Label htmlFor="header-color">Day Header Color</Label>
+          <div className="flex items-center space-x-3">
+            <input 
+              type="color" 
+              id="header-color"
+              value={config.headerColor}
+              onChange={(e) => updateConfig({ headerColor: e.target.value })}
+              className="w-10 h-10 p-1 rounded border cursor-pointer"
+            />
+            <div className="flex-1">
+              <Input 
+                value={config.headerColor} 
+                onChange={(e) => updateConfig({ headerColor: e.target.value })}
+                placeholder="#1e293b"
+              />
+            </div>
+          </div>
+          <p className="text-xs text-gray-500">
+            Choose a color for the day header blocks
+          </p>
+        </div>
+        
         <div className="space-y-3 pt-4">
           <div className="grid grid-cols-2 gap-4">
             <div>

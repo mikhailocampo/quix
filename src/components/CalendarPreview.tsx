@@ -1,14 +1,17 @@
-import { forwardRef, useState } from 'react';
+import { forwardRef, useRef, useState } from 'react';
 import { FlierConfig } from '../lib/types';
 import { Progress } from './ui/progress';
 import { cn } from '../lib/utils';
 
 interface CalendarPreviewProps {
   config: FlierConfig;
+  forExport?: boolean;
 }
 
 export const CalendarPreview = forwardRef<HTMLDivElement, CalendarPreviewProps>(
-  ({ config }, ref) => {
+  ({ config, forExport = false }, ref) => {
+    const dayRefs = useRef<(HTMLDivElement | null)[]>([]);
+    
     const progressPercentage = Math.min(
       100,
       (config.progress.current / config.progress.goal) * 100
@@ -30,10 +33,10 @@ export const CalendarPreview = forwardRef<HTMLDivElement, CalendarPreviewProps>(
       <div
         ref={ref}
         className={cn(
-          "h-full w-full flex overflow-hidden",
+          "h-full w-full flex overflow-hidden relative",
           isDarkMode ? "bg-gray-900" : "bg-white",
-          "border-4 border-dashed",
-          isDarkMode ? "border-gray-600" : "border-gray-300"
+          !forExport && "border-4 border-dashed",
+          !forExport && (isDarkMode ? "border-gray-600" : "border-gray-300")
         )}
         style={{ 
           fontFamily: 'Arial, sans-serif',
@@ -49,32 +52,37 @@ export const CalendarPreview = forwardRef<HTMLDivElement, CalendarPreviewProps>(
             </svg>
           </div>
           
-          <div className="relative z-10 flex-1 flex flex-col items-center w-full !px-4">
+          <div className="relative z-10 flex-1 flex flex-col items-center w-full !px-4 !mt-10">
             <h1 className={cn("text-5xl font-black mb-3 text-center", isDarkMode ? "text-white" : "text-slate-800")}>{config.title}</h1>
-            <h2 className={cn("text-2xl font-medium mb-10 text-center", isDarkMode ? "text-gray-300" : "text-slate-600")}>{config.subtitle}</h2>
+            <h2 className={cn("text-2xl font-medium !mb-10 text-center", isDarkMode ? "text-gray-300" : "text-slate-600")}>{config.subtitle}</h2>
             
             <div className="space-y-6 w-full">
-              {config.days.map((day, index) => (
-                <div key={index} className="relative w-full">
-                  {/* Optional indicator */}
-                  {day.isOptional && (
-                    <div className="absolute -top-3 right-0 bg-blue-600 text-white text-xs px-3 py-1 font-bold">
-                      OPTIONAL
-                    </div>
+              {config.days.map((day, i) => (
+                <div
+                  key={i}
+                  ref={ref => {
+                    if (!dayRefs.current) dayRefs.current = []
+                    dayRefs.current[i] = ref
+                  }}
+                  className={cn(
+                    "overflow-hidden relative"
                   )}
-                  
-                  {/* Day header */}
-                  <div className={cn(
-                    "flex items-center !p-2",
-                    isDarkMode ? "bg-gray-800 text-white" : "bg-slate-800 text-white"
-                  )}>
-                    <div className="flex-1 text-center font-bold text-lg">{day.day}</div>
-                    <div className="text-right font-medium">{day.date}</div>
+                >
+                  <div 
+                    className="flex items-center !p-2 text-white"
+                    style={{ backgroundColor: day.color || config.headerColor }}
+                  >
+                    <div className="flex-1">
+                      <div className="flex justify-between items-center">
+                        <div className="font-bold">{day.day}</div>
+                        <div className="text-xs opacity-90">{day.date}</div>
+                      </div>
+                    </div>
                   </div>
                   
                   {/* Events */}
                   <div className={cn(
-                    "!p-2 shadow-sm w-full",
+                    "!p-2 w-full",
                     isDarkMode ? "bg-gray-700" : "bg-white"
                   )}>
                     {day.events && day.events.length > 0 ? (
@@ -83,15 +91,18 @@ export const CalendarPreview = forwardRef<HTMLDivElement, CalendarPreviewProps>(
                           key={eventIndex} 
                           className={cn(
                             "mb-2 last:mb-0 flex items-start w-full",
-                            event.time ? "justify-between" : "justify-center"
+                            "justify-between"
                           )}
                         >
-                          <div className={cn(
-                            "font-medium",
-                            event.time ? "text-left flex-1 pr-3" : "text-center",
-                            isDarkMode ? "text-white" : "text-gray-800"
-                          )}>
-                            {event.title}
+                          <div className="flex items-center font-medium text-left flex-1 pr-3">
+                            <span className={isDarkMode ? "text-white" : "text-gray-800"}>
+                              {event.title}
+                            </span>
+                            {event.isOptional && (
+                              <span className="ml-2 bg-blue-600 text-white text-xs !px-2 py-0.5 !ml-2 font-bold whitespace-nowrap rounded-md">
+                                OPTIONAL
+                              </span>
+                            )}
                           </div>
                           {event.time && (
                             <div className={cn(
@@ -137,7 +148,11 @@ export const CalendarPreview = forwardRef<HTMLDivElement, CalendarPreviewProps>(
                 <p className="text-sm">No background image</p>
               </div>
             )}
-            <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+            {/* Apply appropriate overlay based on image status */}
+            {(!hasValidImageUrl || imgError) ? 
+              <div className="absolute inset-0 bg-black bg-opacity-40"></div> : 
+              <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-black/80"></div>
+            }
           </div>
           
           {/* Content */}
@@ -147,12 +162,10 @@ export const CalendarPreview = forwardRef<HTMLDivElement, CalendarPreviewProps>(
               {config.rightPanel.hashtags.map((hashtag, index) => (
                 <div 
                   key={index} 
-                  className={cn(
-                    "text-5xl font-bold mb-4 drop-shadow-md",
-                    index % 2 === 0 ? "text-white" : "text-yellow-300"
-                  )}
+                  className="text-5xl font-bold mb-4 drop-shadow-md"
+                  style={{ color: hashtag.color }}
                 >
-                  {hashtag}
+                  {hashtag.text}
                 </div>
               ))}
               
@@ -168,12 +181,12 @@ export const CalendarPreview = forwardRef<HTMLDivElement, CalendarPreviewProps>(
               <div className="mb-2 relative">
                 <Progress 
                   value={progressPercentage} 
-                  className="h-8 rounded-full overflow-hidden bg-gray-700 bg-opacity-50" 
+                  className="h-8 rounded-full overflow-hidden bg-gray-700 bg-opacity-50 !m-5" 
                   style={{ 
                     '--progress-background': config.progress.color 
                   } as React.CSSProperties}
                 />
-                <div className="absolute inset-0 flex items-center justify-center text-sm font-bold drop-shadow-md">
+                <div className="absolute inset-0 flex items-center justify-center text-2xl font-bold drop-shadow-md">
                   {`${config.progress.current}/${config.progress.goal}`}
                 </div>
                 {isGoalReached && (
@@ -184,6 +197,11 @@ export const CalendarPreview = forwardRef<HTMLDivElement, CalendarPreviewProps>(
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Attribution - absolute positioned at bottom left */}
+        <div className="absolute bottom-2 left-2 text-xs text-gray-500 dark:text-gray-400 opacity-50 z-20">
+          Made with Quix
         </div>
       </div>
     );

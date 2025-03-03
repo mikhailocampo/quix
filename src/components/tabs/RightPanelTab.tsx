@@ -13,7 +13,18 @@ interface RightPanelTabProps {
 export function RightPanelTab({ config, updateConfig }: RightPanelTabProps) {
   const updateHashtag = (index: number, value: string) => {
     const newHashtags = [...config.rightPanel.hashtags];
-    newHashtags[index] = value;
+    newHashtags[index] = { ...newHashtags[index], text: value };
+    updateConfig({ 
+      rightPanel: { 
+        ...config.rightPanel, 
+        hashtags: newHashtags 
+      } 
+    });
+  };
+  
+  const updateHashtagColor = (index: number, color: string) => {
+    const newHashtags = [...config.rightPanel.hashtags];
+    newHashtags[index] = { ...newHashtags[index], color };
     updateConfig({ 
       rightPanel: { 
         ...config.rightPanel, 
@@ -26,7 +37,7 @@ export function RightPanelTab({ config, updateConfig }: RightPanelTabProps) {
     updateConfig({ 
       rightPanel: { 
         ...config.rightPanel, 
-        hashtags: [...config.rightPanel.hashtags, ''] 
+        hashtags: [...config.rightPanel.hashtags, { text: '', color: '#FFFFFF' }] 
       } 
     });
   };
@@ -104,10 +115,21 @@ export function RightPanelTab({ config, updateConfig }: RightPanelTabProps) {
           {config.rightPanel.hashtags.map((hashtag, index) => (
             <div key={index} className="flex space-x-3 items-center">
               <Input 
-                value={hashtag} 
+                value={hashtag.text} 
                 onChange={(e) => updateHashtag(index, e.target.value)}
                 placeholder={`Hashtag #${index + 1}`}
+                className="flex-grow"
               />
+              <div className="flex items-center space-x-2">
+                <Label htmlFor={`hashtag-color-${index}`} className="sr-only">Color</Label>
+                <input 
+                  type="color" 
+                  id={`hashtag-color-${index}`}
+                  value={hashtag.color}
+                  onChange={(e) => updateHashtagColor(index, e.target.value)}
+                  className="w-10 h-10 p-1 rounded border cursor-pointer"
+                />
+              </div>
               <Button 
                 variant="ghost" 
                 size="icon"
