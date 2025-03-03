@@ -77,46 +77,6 @@ export function CalendarTemplate() {
     setConfig(migrateHashtags(newConfig));
   };
 
-  const handleExport = async () => {
-    // Show the export preview
-    setShowExportPreview(true);
-    
-    // Wait for the DOM to update
-    setTimeout(async () => {
-      if (!exportRef.current) {
-        setShowExportPreview(false);
-        return;
-      }
-      
-      try {
-        // Generate the image
-        const dataUrl = await toPng(exportRef.current, { 
-          quality: 0.95,
-          pixelRatio: 2
-        });
-        
-        // Create a download link
-        const link = document.createElement('a');
-        link.download = 'calendar-flyer.png';
-        link.href = dataUrl;
-        link.click();
-        
-        // Trigger confetti when export is successful
-        confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 }
-        });
-      } catch (error) {
-        console.error('Error exporting image:', error);
-        alert('Failed to export image. Please try again.');
-      }
-      
-      // Hide the export preview
-      setShowExportPreview(false);
-    }, 100);
-  };
-
   const copyToClipboard = async () => {
     // Show the export preview
     setShowExportPreview(true);
@@ -157,7 +117,7 @@ export function CalendarTemplate() {
         });
       } catch (error) {
         console.error('Error copying to clipboard:', error);
-        showToast("Failed to copy image to clipboard. Please try exporting instead.", "error");
+        showToast("Failed to copy image to clipboard. Please try again.", "error");
       }
       
       // Hide the export preview
