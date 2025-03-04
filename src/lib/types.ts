@@ -170,7 +170,7 @@ export const defaultFlierConfig: FlierConfig = {
     }
   ],
   rightPanel: {
-    backgroundImage: "https://images.unsplash.com/photo-1516542076529-1ea3854896f2?q=80&w=2342&auto=format&fit=crop",
+    backgroundImage: "https://images.unsplash.com/photo-1504851149312-7a075b496cc7?q=80&w=2610&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     hashtags: [
       { text: "#MARCH 3", color: "#FFFFFF" },
       { text: "LAUNCH", color: "#FFC107" },

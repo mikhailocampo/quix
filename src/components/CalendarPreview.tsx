@@ -2,6 +2,32 @@ import { forwardRef, useRef, useState } from 'react';
 import { FlierConfig } from '../lib/types';
 import { Progress } from './ui/progress';
 import { cn } from '../lib/utils';
+import { FireIcon } from '@heroicons/react/24/outline';
+
+// Helper function to adjust HSL lightness for dynamic theme adjustment
+function adjustHslLightness(isDarkMode: boolean, baseColor: string = '') {
+  // Default to a slate color if no base color is provided
+  const fallbackColor = isDarkMode ? 'hsl(215, 16%, 25%)' : 'hsl(215, 16%, 90%)';
+  
+  try {
+    // If baseColor is already in HSL format, adjust it
+    if (baseColor.startsWith('hsl')) {
+      const match = baseColor.match(/hsl\(\s*(\d+)\s*,\s*(\d+)%\s*,\s*(\d+)%\s*\)/);
+      if (match) {
+        const [, h, s] = match;
+        // In dark mode, we want a subtle but visible light shade
+        // In light mode, we want a subtle but visible dark shade
+        const newLightness = isDarkMode ? '25%' : '90%';
+        return `hsl(${h}, ${s}%, ${newLightness})`;
+      }
+    }
+    
+    // If it's a hex color or invalid format, return fallback
+    return fallbackColor;
+  } catch {
+    return fallbackColor;
+  }
+}
 
 interface CalendarPreviewProps {
   config: FlierConfig;
@@ -28,6 +54,9 @@ export const CalendarPreview = forwardRef<HTMLDivElement, CalendarPreviewProps>(
     // Check if the background image URL is valid
     const hasValidImageUrl = config.rightPanel.backgroundImage && 
                             config.rightPanel.backgroundImage.trim() !== '';
+    
+    // Dynamic background color for the watermark design
+    const watermarkColor = adjustHslLightness(isDarkMode);
 
     return (
       <div
@@ -52,9 +81,25 @@ export const CalendarPreview = forwardRef<HTMLDivElement, CalendarPreviewProps>(
             </svg>
           </div>
           
-          <div className="relative z-10 flex-1 flex flex-col items-center w-full !px-4 !mt-10">
-            <h1 className={cn("text-5xl font-black mb-3 text-center", isDarkMode ? "text-white" : "text-slate-800")}>{config.title}</h1>
-            <h2 className={cn("text-2xl font-medium !mb-10 text-center", isDarkMode ? "text-gray-300" : "text-slate-600")}>{config.subtitle}</h2>
+          {/* Background design with running icon and goal number */}
+          <div className="absolute top-0 left-0 w-full h-60 opacity-100 pointer-events-none overflow-hidden">
+            <div className="flex items-center justify-center">
+              <FireIcon 
+                className="w-25 h-25" 
+                style={{ color: watermarkColor }}
+              />
+              <div 
+                className="text-8xl font-black ml-4" 
+                style={{ color: watermarkColor }}
+              >
+                {config.progress.goal}
+              </div>
+            </div>
+          </div>
+          
+          <div className="relative z-10 flex-1 flex flex-col items-center w-full !px-4 !mt-15">
+            <h1 className={cn("text-4xl font-black mb-3 text-center", isDarkMode ? "text-white" : "text-slate-800")}>{config.title}</h1>
+            <h2 className={cn("text-xl font-medium !mb-10 text-center", isDarkMode ? "text-gray-300" : "text-slate-600")}>{config.subtitle}</h2>
             
             <div className="space-y-6 w-full">
               {config.days.map((day, i) => (
